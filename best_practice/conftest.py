@@ -82,10 +82,10 @@ def mobile_web_driver(request, data_center):
 
     test_name = request.node.name
     build_tag = environ.get('BUILD_TAG', "Sauce-Best-Practices-Python-Mobile-Web")
-   
+
     username = environ['SAUCE_USERNAME']
     access_key = environ['SAUCE_ACCESS_KEY']
-        
+
     if data_center and data_center.lower() == 'eu':
         selenium_endpoint = "https://{}:{}@ondemand.eu-central-1.saucelabs.com/wd/hub".format(username, access_key)
     else:
@@ -98,7 +98,7 @@ def mobile_web_driver(request, data_center):
 
     browser = webdriver.Remote(
         command_executor=selenium_endpoint,
-        desired_capabilities=caps, 
+        desired_capabilities=caps,
         keep_alive=True
     )
 
@@ -123,10 +123,10 @@ def desktop_web_driver(request, data_center):
 
     test_name = request.node.name
     build_tag = environ.get('BUILD_TAG', "Sauce-Best-Practices-Python-Desktop-Web")
-    
+
     username = environ['SAUCE_USERNAME']
     access_key = environ['SAUCE_ACCESS_KEY']
-    
+
     if data_center and data_center.lower() == 'eu':
         selenium_endpoint = "https://{}:{}@ondemand.eu-central-1.saucelabs.com/wd/hub".format(username, access_key)
     else:
@@ -139,7 +139,7 @@ def desktop_web_driver(request, data_center):
 
     browser = webdriver.Remote(
         command_executor=selenium_endpoint,
-        desired_capabilities=caps, 
+        desired_capabilities=caps,
         keep_alive=True
     )
 
@@ -164,15 +164,16 @@ def rdc_browser(request, data_center):
 
     username_cap = environ['SAUCE_USERNAME']
     access_key_cap = environ['SAUCE_ACCESS_KEY']
-    
+
     caps = {
         'username': username_cap,
         'accessKey': access_key_cap,
-        'deviceName': 'iPhone.*',
+        'deviceName': 'iPhone_12_POC137',
         'platformName': 'iOS',
-        'build': 'RDC-Android-Web-Python-Best-Practice',
+        'build': 'RDC-iOS-Web-Python-Best-Practice',
         'name': request.node.name,
-        'browserName': 'Safari'
+        'browserName': 'Safari',
+        'cacheId': 'grogu'
     }
 
     if data_center and data_center.lower() == 'eu':
@@ -189,17 +190,18 @@ def rdc_browser(request, data_center):
 @pytest.fixture
 def android_rdc_driver(request, data_center):
 
-    username_cap = environ['SAUCE_USERNAME']
-    access_key_cap = environ['SAUCE_ACCESS_KEY']
-    
+    #username_cap = environ['SAUCE_USERNAME']
+    #access_key_cap = environ['SAUCE_ACCESS_KEY']
+
     caps = {
         'username': username_cap,
         'accessKey': access_key_cap,
-        'deviceName': 'Google.*',
+        'deviceName': 'Samsung_Galaxy_S20_FE_5G_POC116',
         'platformName': 'Android',
         'build': 'RDC-Android-Python-Best-Practice',
         'name': request.node.name,
-        'app': "https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/Android.SauceLabs.Mobile.Sample.app.2.7.1.apk"
+        'app': "https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/Android.SauceLabs.Mobile.Sample.app.2.7.1.apk",
+        'cacheId': 'grogu'
     }
 
     if data_center and data_center.lower() == 'eu':
@@ -218,20 +220,21 @@ def ios_rdc_driver(request, data_center):
 
     username_cap = environ['SAUCE_USERNAME']
     access_key_cap = environ['SAUCE_ACCESS_KEY']
-   
+
     caps = {
         'username': username_cap,
         'accessKey': access_key_cap,
-        'deviceName': 'iPhone.*',
+        'deviceName': 'iPhone_12_POC137',
         'platformName': 'iOS',
         'build': 'RDC-iOS-Python-Best-Practice',
         'name': request.node.name,
-        'app': 'https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/iOS.RealDevice.SauceLabs.Mobile.Sample.app.2.7.1.ipa'
+        'app': 'https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/iOS.RealDevice.SauceLabs.Mobile.Sample.app.2.7.1.ipa',
+        'cacheId': 'grogu'
     }
 
     if data_center and data_center.lower() == 'eu':
         sauce_url = "http://ondemand.eu-central-1.saucelabs.com/wd/hub"
-    else:   
+    else:
         sauce_url = "http://ondemand.us-west-1.saucelabs.com/wd/hub"
 
     driver = appiumdriver.Remote(sauce_url, desired_capabilities=caps)
@@ -250,4 +253,3 @@ def pytest_runtest_makereport(item, call):
     # set an report attribute for each phase of a call, which can
     # be "setup", "call", "teardown"
     setattr(item, "rep_" + rep.when, rep)
-
