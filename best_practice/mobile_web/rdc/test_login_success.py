@@ -1,4 +1,4 @@
-def test_valid_crentials_login(rdc_browser):
+def test_valid_login(rdc_browser):
     rdc_browser.get('https://www.saucedemo.com/v1')
 
     rdc_browser.find_element_by_id('user-name').send_keys('standard_user')
