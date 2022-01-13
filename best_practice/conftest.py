@@ -168,12 +168,13 @@ def rdc_browser(request, data_center):
     caps = {
         'username': username_cap,
         'accessKey': access_key_cap,
-        'deviceName': 'iPhone_12_POC115',
+        'deviceName': 'iPhone.*',
         'platformName': 'iOS',
         'build': 'RDC-iOS-Web-Python-Best-Practice',
         'name': request.node.name,
         'browserName': 'Safari',
-        'cacheId': 'grogu'
+        'cacheId': 'grogu',
+        'privateDevicesOnly': True
     }
 
     if data_center and data_center.lower() == 'eu':
@@ -190,18 +191,23 @@ def rdc_browser(request, data_center):
 @pytest.fixture
 def android_rdc_driver(request, data_center):
 
-    #username_cap = environ['SAUCE_USERNAME']
-    #access_key_cap = environ['SAUCE_ACCESS_KEY']
+    username_cap = environ['SAUCE_USERNAME']
+    access_key_cap = environ['SAUCE_ACCESS_KEY']
 
     caps = {
         'username': username_cap,
         'accessKey': access_key_cap,
-        'deviceName': 'Samsung_Galaxy_S20_FE_5G_POC116',
-        'platformName': 'Android',
+        'deviceName': 'Google Pixel.*',
+        'platformName': 'android',
         'build': 'RDC-Android-Python-Best-Practice',
         'name': request.node.name,
         'app': "https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/Android.SauceLabs.Mobile.Sample.app.2.7.1.apk",
-        'cacheId': 'grogu'
+        'cacheId': 'grogu',
+        'privateDevicesOnly': True,
+        'noReset': True,
+        'newCommandTimeout': '90',
+        'idleTimeout': '90'
+        #'appWaitActivity': 'com.swaglabsmobileapp.MainActivity'
     }
 
     if data_center and data_center.lower() == 'eu':
@@ -224,12 +230,13 @@ def ios_rdc_driver(request, data_center):
     caps = {
         'username': username_cap,
         'accessKey': access_key_cap,
-        'deviceName': 'iPhone_12_POC115',
+        'deviceName': 'iPhone_12_POC137',
         'platformName': 'iOS',
         'build': 'RDC-iOS-Python-Best-Practice',
         'name': request.node.name,
         'app': 'https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/iOS.RealDevice.SauceLabs.Mobile.Sample.app.2.7.1.ipa',
-        'cacheId': 'grogu'
+        'cacheId': 'grogu',
+        'privateDevicesOnly': True
     }
 
     if data_center and data_center.lower() == 'eu':
