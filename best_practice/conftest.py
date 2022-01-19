@@ -198,7 +198,7 @@ def android_rdc_driver(request, data_center):
         'username': username_cap,
         'accessKey': access_key_cap,
         'deviceName': 'Google Pixel.*',
-        'platformName': 'android',
+        'platformName': 'Android',
         'build': 'RDC-Android-Python-Best-Practice',
         'name': request.node.name,
         'app': "https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/Android.SauceLabs.Mobile.Sample.app.2.7.1.apk",
@@ -230,7 +230,7 @@ def ios_rdc_driver(request, data_center):
     caps = {
         'username': username_cap,
         'accessKey': access_key_cap,
-        'deviceName': 'iPhone_12_POC137',
+        'deviceName': 'iPhone.*',
         'platformName': 'iOS',
         'build': 'RDC-iOS-Python-Best-Practice',
         'name': request.node.name,

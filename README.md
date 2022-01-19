@@ -106,7 +106,7 @@ caps = {
 ```python
 # any iPhone from my private device pool
 caps = {
-    'deviceName': 'iPhone.\*',
+    'deviceName': 'iPhone.*',
     'platformName': 'iOS',
     'cacheId': 'booboo',
     'privateDevicesOnly': True
@@ -118,7 +118,7 @@ caps = {
 ```python
 # any iOS 15.x phone from the public device pool
 caps = {
-    'deviceName': '*',
+    'deviceName': '.*',
     'platformName': 'iOS',
     'platformVersion': 15,
     'phoneOnly': True,
