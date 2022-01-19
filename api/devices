@@ -1,0 +1,117 @@
+#!/bin/bash
+#
+# 2022-01-012
+# kareem@saucelabs.com
+#
+# list allTheDevices w/ availability
+#
+
+
+protoHost="https://api.us-west-1.saucelabs.com"
+userKey="${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}"
+timeStamp=$(date +"%Y-%m-%d_%H%M%S_%s")
+scriptPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+quickSauceHome=$( echo "${scriptPath%/*}" )
+requestCounter=0   
+
+
+function pre_flight {
+  binCheckCurl=$(command -v curl)
+  binCheckJq=$(command -v jq)
+  [[ -z ${SAUCE_USERNAME} || -z ${SAUCE_ACCESS_KEY} ]] && exit 2
+  [[ -z ${binCheckJq} || -z ${binCheckCurl} ]] && exit 2
+}
+
+
+function device_info_all {
+  method="v1/rdc/devices"
+  sauce_get ${method}/${1} |jq
+}
+
+
+function device_info_public {
+  [[ -z ${deviceInfoAll} ]] && deviceInfoAll=$(device_info_all)
+  jq '.[] |select(.isPrivate == false)' <<< "$deviceInfoAll" |jq -nc '[inputs]'
+}
+
+
+function device_info_private {
+    [[ -z ${deviceInfoAll} ]] && deviceInfoAll=$(device_info_all)
+    jq '.[] |select(.isPrivate == true)' <<< "$deviceInfoAll" |jq -nc '[inputs]'
+}
+
+
+function device_state_all {
+  method="v1/rdc/devices/available"
+  sauce_get ${method} |jq '.[] |{id: ., isAvailable: true}' |jq -nc '[inputs]'
+}
+
+
+function sauce_get {
+    curl --request GET --silent --user ${userKey} \
+      --header "Accept: application/json" ${protoHost}/${1}
+}
+
+
+function device_summary_public {
+  islaSorna="${deviceStateAll} ${deviceInfoPublic}"
+  device_summary "$islaSorna"
+}
+
+
+function device_summary_private {
+  islaNublar="${deviceStateAll} ${deviceInfoPrivate}"
+  device_summary "$islaNublar"
+}
+
+
+function device_summary {
+  jq --null-input 'inputs[]' <<< "$1" \
+    |jq --slurp '. |group_by(.id)[] |add |select(.name != null)' \
+      |jq --compact-output '. |
+        {
+          id: .id,
+          isPrivate: .isPrivate,
+          isAvailable: (if .isAvailable == null then false else .isAvailable end),
+          modelNumber: .modelNumber,
+          os: .os,
+          osVersion: .osVersion
+        }' |jq --null-input --compact-output '[inputs]'
+}
+
+
+function sauce_flush {
+  # print to file
+  baseDir="${quickSauceHome}/data/api/devices/${timeStamp}"
+  mkdir -p ${baseDir}
+  
+  jq <<< "$deviceInfoAll"         > ${baseDir}/deviceInfoAll.json
+  jq <<< "$deviceInfoPublic"      > ${baseDir}/deviceInfoPublic.json
+  jq <<< "$deviceInfoPrivate"     > ${baseDir}/deviceInfoPrivate.json
+  jq <<< "$deviceSummaryPublic"   > ${baseDir}/deviceSummaryPublic.json
+  jq <<< "$deviceSummaryPrivate"  > ${baseDir}/deviceSummaryPrivate.json
+
+  echo -e "\ndata file path: ${baseDir}"
+  exit
+}
+
+
+function sauce_debug {
+  islaSorna="${deviceStateAll} ${deviceInfoPublic}"
+  islaNublar="${deviceStateAll} ${deviceInfoPrivate}"
+  jq <<< "$islaSorna"       > ${baseDir}/islaSorna.json
+  jq <<< "$islaNublar"      > ${baseDir}/islaNublar.json
+  jq <<< "$deviceStateAll"  > ${baseDir}/deviceStateAll.json
+}
+
+
+pre_flight
+deviceInfoAll=$(device_info_all)
+deviceInfoPublic=$(device_info_public)
+deviceInfoPrivate=$(device_info_private)
+deviceStateAll=$(device_state_all)
+deviceSummaryPrivate=$(device_summary_private)
+deviceSummaryPublic=$(device_summary_public)
+sauce_flush
+
+exit 1
