@@ -30,7 +30,7 @@
 
 &nbsp;
 
-```sh
+```shell
 # clone repo
 git clone https://github.com/kmissoumi/demo-python.git && cd demo-python
 
@@ -44,8 +44,24 @@ pipenv shell
 python --version      # Python 3.9.9
 pipenv --version      # pipenv, version 2021.11.23             
 
-# run test
-pytest best_practice/mobile_native/ios
+
+# notes // the test suite referenced below has (5) tests
+
+# run the entire test suite once, (5) tests
+# on the same (1) device, cacheId key with the same UUID as the value for each test
+pytest best_practice/mobile_native/android --dc=us
+
+# run the entire test suite, (5) tests, on (N) devices
+pytest best_practice/mobile_native/android --dc=us -n20
+
+
+
+# run all (5) tests, twice on a single device
+pytest best_practice/mobile_native/android --dc=us --count 2 
+
+# run all 
+
+
 ```
 
    </br>
@@ -170,6 +186,7 @@ caps = {
 ---
 
 ### Device Cleanup
+
 #### Per Session _[Device Cleanup](https://docs.saucelabs.com/mobile-apps/supported-devices/#real-device-cleaning)_ Steps
 
 - accounts and data _cleared_
@@ -216,3 +233,7 @@ caps = {
   "Knowledge Base Articles"
 [13]: <https://docs.saucelabs.com/mobile-apps/supported-devices/#dynamic-device-allocation>
   "Dynamic Device Allocation"
+
+
+
+  [100]: best_practice/conftest.py

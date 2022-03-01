@@ -1,4 +1,5 @@
 import pytest
+import uuid
 from os import environ
 
 from selenium import webdriver
@@ -67,6 +68,21 @@ desktop_browsers = [
         }
     }]
 
+android_devices_ = [
+    {
+        "deviceName": "Google Pixel.*",
+        "platformName": "Android",
+        "platformVersion": "12",
+    }]
+
+android_devices= [
+    {
+        "deviceName": "Google Pixel.*",
+        "platformName": "Android",
+        "cacheId": str(uuid.uuid4()),
+        "noReset": False,
+        "platformVersion": "12",
+    }]
 
 def pytest_addoption(parser):
     parser.addoption("--dc", action="store", default='us', help="Set Sauce Labs Data Center (US or EU)")
@@ -188,32 +204,32 @@ def rdc_browser(request, data_center):
     driver.execute_script("sauce:job-result={}".format(sauce_result))
     driver.quit()
 
-@pytest.fixture
+@pytest.fixture(params=android_devices)
 def android_rdc_driver(request, data_center):
 
-    username_cap = environ['SAUCE_USERNAME']
-    access_key_cap = environ['SAUCE_ACCESS_KEY']
+    test_name = request.node.name
+    build_tag = environ.get('BUILD_TAG', 'RDC-Android-Python-MultiPass-Best-Practice')
+    app_path = 'https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/Android.SauceLabs.Mobile.Sample.app.2.7.1.apk'
+    privateDevicesOnly = False
+    newCommandTimeout = '15'
+    idleTimeout = '15'
 
-    caps = {
-        'username': username_cap,
-        'accessKey': access_key_cap,
-        'deviceName': 'Google Pixel.*',
-        'platformName': 'Android',
-        'build': 'RDC-Android-Python-Best-Practice',
-        'name': request.node.name,
-        'app': "https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/Android.SauceLabs.Mobile.Sample.app.2.7.1.apk",
-        'cacheId': 'grogu',
-        'privateDevicesOnly': True,
-        'noReset': True,
-        'newCommandTimeout': '90',
-        'idleTimeout': '90'
-        #'appWaitActivity': 'com.swaglabsmobileapp.MainActivity'
-    }
+    username = environ['SAUCE_USERNAME']
+    access_key = environ['SAUCE_ACCESS_KEY']
+
+    caps = dict()
+    caps.update(request.param)
+    caps.update({'build': build_tag})
+    caps.update({'name': test_name})
+    caps.update({'app': app_path})
+    caps.update({'privateDevicesOnly': privateDevicesOnly})
+    caps.update({'newCommandTimeout': newCommandTimeout})
+    caps.update({'idleTimeout': idleTimeout})
 
     if data_center and data_center.lower() == 'eu':
-        sauce_url = 'http://ondemand.eu-central-1.saucelabs.com/wd/hub'
+        sauce_url = "https://{}:{}@ondemand.eu-central-1.saucelabs.com/wd/hub".format(username, access_key)
     else:
-        sauce_url = 'http://ondemand.us-west-1.saucelabs.com/wd/hub'
+        sauce_url = "https://{}:{}@ondemand.us-west-1.saucelabs.com/wd/hub".format(username, access_key)
 
     driver = appiumdriver.Remote(sauce_url, desired_capabilities=caps)
     yield driver
