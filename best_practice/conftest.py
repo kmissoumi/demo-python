@@ -1,5 +1,6 @@
 import pytest
 import uuid
+import sys
 from os import environ
 
 from selenium import webdriver
@@ -68,21 +69,16 @@ desktop_browsers = [
         }
     }]
 
-android_devices_ = [
-    {
-        "deviceName": "Google Pixel.*",
-        "platformName": "Android",
-        "platformVersion": "12",
-    }]
 
-android_devices= [
+android_devices = [
     {
         "deviceName": "Google Pixel.*",
         "platformName": "Android",
         "cacheId": str(uuid.uuid4()),
-        "noReset": False,
-        "platformVersion": "12",
+        "noReset": True,
+        "platformVersion": "12"
     }]
+
 
 def pytest_addoption(parser):
     parser.addoption("--dc", action="store", default='us', help="Set Sauce Labs Data Center (US or EU)")
@@ -204,6 +200,7 @@ def rdc_browser(request, data_center):
     driver.execute_script("sauce:job-result={}".format(sauce_result))
     driver.quit()
 
+
 @pytest.fixture(params=android_devices)
 def android_rdc_driver(request, data_center):
 
@@ -211,8 +208,8 @@ def android_rdc_driver(request, data_center):
     build_tag = environ.get('BUILD_TAG', 'RDC-Android-Python-MultiPass-Best-Practice')
     app_path = 'https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/Android.SauceLabs.Mobile.Sample.app.2.7.1.apk'
     privateDevicesOnly = False
-    newCommandTimeout = '15'
-    idleTimeout = '15'
+    newCommandTimeout = '30'
+    idleTimeout = '30'
 
     username = environ['SAUCE_USERNAME']
     access_key = environ['SAUCE_ACCESS_KEY']
@@ -225,6 +222,8 @@ def android_rdc_driver(request, data_center):
     caps.update({'privateDevicesOnly': privateDevicesOnly})
     caps.update({'newCommandTimeout': newCommandTimeout})
     caps.update({'idleTimeout': idleTimeout})
+    #caps.update({'cacheId': str(uuid.uuid4())})
+    #caps.update({'noReset': True})
 
     if data_center and data_center.lower() == 'eu':
         sauce_url = "https://{}:{}@ondemand.eu-central-1.saucelabs.com/wd/hub".format(username, access_key)

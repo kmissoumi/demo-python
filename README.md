@@ -16,8 +16,6 @@
 | :page_facing_up: _`saucelabs`_ [API Reference][9]                 |
 
 
-
-
 &nbsp;
 
 ### _Quick Start_
@@ -43,30 +41,74 @@ pipenv shell
 # optional info
 python --version      # Python 3.9.9
 pipenv --version      # pipenv, version 2021.11.23             
-
-
-# notes // the test suite referenced below has (5) tests
-
-# run the entire test suite once, (5) tests
-# on the same (1) device, cacheId key with the same UUID as the value for each test
-pytest best_practice/mobile_native/android --dc=us
-
-# run the entire test suite, (5) tests, on (N) devices
-pytest best_practice/mobile_native/android --dc=us -n20
-
-
-
-# run all (5) tests, twice on a single device
-pytest best_practice/mobile_native/android --dc=us --count 2 
-
-# run all 
-
-
 ```
 
-   </br>
+
+The test suite referenced below has (5) tests.  
+
+- The format follows as this `B<NN>_S<NN>_D<NN>_C<NN>_J<NN>`  
+  - Where `N` is a number.
+  - Where `B` is the build prefix.
+  - Where `S` is for the suite, and `N` is the number of cycles run.
+  - Where `D` is for the device, and `N` is the number of devices requested.
+  - Where `J` is for jobs, and `N` is the number of jobs submitted.
+
+```shell
+# Test 01
+#   Run the entire test suite, (5) tests, (1) cycle.
+#   Spread the tests out over (1) device.
+export BUILD_TAG="B01_S01_D01_J05"
+pytest best_practice/mobile_native/android --dc=us
+
+# Test 02
+#   Run the entire test suite, (5) tests, , (1) cycle.
+#   Spread the tests out over (5) devices.
+export BUILD_TAG="B02_S01_D05_C01_J05"
+pytest best_practice/mobile_native/android --dc=us -n5
+```
+
+_Does a request for 5x devices result in 5x performance?_
+
+_What if we don't use cacheId?_
+
+```shell
+# Test 03
+#   Run every test in the entire test suite, (5) times in a row, for (5) full cycles.
+#   On the same (1) device.
+export BUILD_TAG="B03_S05_D01_J25"
+pytest best_practice/mobile_native/android --dc=us --count 5
+
+
+# Test 04
+#   Run each test in the suite (5) times in a row.
+#   Spread the tests out over (5) devices.
+#   Tests are submitted to the first allocated device that is available. 
+export BUILD_TAG="B04_S10_D20_J25"
+pytest best_practice/mobile_native/android --dc=us -n5 --count 5
+
+
+# Test 05
+#   Run the entire test suite, (5) tests, (10) full cycles
+#   Spread the tests out over (10) devices.
+export BUILD_TAG="B05_S10_D20_J50"
+pytest best_practice/mobile_native/android --dc=us -n10 --count 10
+```
+
+</br>
+
 
 ---
+Explore other plugins such as [pytest-parallel][210].
+
+```shell
+export BUILD_TAG="ZZ_S01_W05_J05"`  
+pytest best_practice/mobile_native/android --dc=us --workers 5`
+```
+
+</br>
+
+---
+
 
 ## _Dynamic Device Allocation_
 
@@ -236,4 +278,6 @@ caps = {
 
 
 
-  [100]: best_practice/conftest.py
+[100]: best_practice/conftest.py
+[200]: https://pypi.org/project/pytest-xdist
+[210]: https://pypi.org/project/pytest-parallel
