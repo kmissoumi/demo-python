@@ -15,11 +15,13 @@ Start Session
     ...  username=%{SAUCE_USERNAME}
     ...  accessKey=%{SAUCE_ACCESS_KEY}
     ...  privateDevicesOnly=${PRIVATE_DEVICES_ONLY}
-    ...  app=storage:filename=iOS.RealDevice.SauceLabs.Mobile.Sample.app.2.7.0.ipa
+    ...  app=https://github.com/saucelabs/sample-app-mobile/releases/download/2.7.1/iOS.RealDevice.SauceLabs.Mobile.Sample.app.2.7.1.ipa
     ...  name=${TEST_NAME} 
 
 End Session
-    Close all applications
+    Run Keyword If  '${TEST_STATUS}'== 'PASS'  Execute Javascript  sauce:job-result=passed
+    ...  ELSE  Execute Javascript  sauce:job-result=failed
+    Close Browser    Close all applications
 
 Login As Standard User
 

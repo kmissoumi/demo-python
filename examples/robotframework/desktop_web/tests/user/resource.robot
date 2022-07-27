@@ -10,23 +10,28 @@ Library  SeleniumLibrary
     ...  username: %{SAUCE_USERNAME},
     ...  accessKey: %{SAUCE_ACCESS_KEY},
     ...  name: ${SUITE_NAME},
-    ...  build: Python-Robot-Selenium-VDC
+    ...  build: Python-Robot-Selenium-VDC-%{buildId}
+
 
 ${browser}          ${browserName}
 ${capabilities}     ${EMPTY.join(${_tmp})} 
-${remote_url}       ${DATA_CENTER}
+${remote_url}       https://ondemand.eu-central-1.saucelabs.com/wd/hub
+
 
 *** Keywords ***
+
 
 Open login page
     Open browser  https://www.saucedemo.com/v1/  browser=${browser}
     ...  remote_url=${remote_url}
     ...  desired_capabilities=${capabilities}
 
+
 Open inventory page
     Open browser  https://www.saucedemo.com/v1/inventory.html  browser=${browserName}
     ...  remote_url=${remote_url}
     ...  desired_capabilities=${capabilities}
+
 
 Login As Standard User
 
@@ -41,6 +46,7 @@ Login As Invalid User
 	Input text  id:password  invalid
 	Click button  class:btn_action
 
+
 Add Item To Cart
 
     Click button  class:btn_primary
@@ -54,6 +60,7 @@ Remove Item From Cart
 Has Items In Cart
 
 	Page should contain element  class:shopping_cart_badge
+
 
 End Session
     Run Keyword If  '${TEST_STATUS}'== 'PASS'  Execute Javascript  sauce:job-result=passed

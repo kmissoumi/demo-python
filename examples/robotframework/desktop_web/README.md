@@ -1,5 +1,34 @@
 ## Python-Robot-Selenium
 
+```shell
+export ROBOT_HOME="./examples/robotframework"
+export ROBOT_WEB="${ROBOT_HOME}/desktop_web"
+export ROBOT_HANDY="${ROBOT_HOME}/native_mobile"
+
+export buildId=$(date +%s)
+robot   --timestampoutputs \
+        --outputdir ./artifacts/robot/${buildId} \
+        --argumentfile ${ROBOT_WEB}/chrome_config.txt \
+        ${ROBOT_WEB}/tests/user
+
+
+robot --argumentfile ${ROBOT_HANDY}/android/android_config.txt ${ROBOT_HANDY}/android/Tests/
+robot --argumentfile ${ROBOT_HANDY}/ios/iphone_config.txt ${ROBOT_HANDY}/iphone/Tests/
+
+
+
+export buildId=$(date +%s)
+pabot \
+    --testlevelsplit \
+    --argumentfile1 ${ROBOT_WEB}/chrome_config.txt \
+    --argumentfile2 ${ROBOT_WEB}/firefox_config.txt \
+    --argumentfile3 ${ROBOT_WEB}/ie_config.txt \
+    --timestampoutputs \
+    --outputdir ./artifacts/robot/${SECONDS} \
+    ${ROBOT_WEB}/tests/user
+```
+
+
 This is a sample framework for working with Robotframework and Sauce Labs. It makes use of the pabot plugin for parallelization and selenium2library for working with Selenium and Sauce. This sample does work with Python 2.7 and Python 3.6.
 
 This code is provided on an "AS-IS” basis without warranty of any kind, either express or implied, including without limitation any implied warranties of condition, uninterrupted use, merchantability, fitness for a particular purpose, or non-infringement. Your tests and testing environments may require you to modify this framework. Issues regarding this framework should be submitted through GitHub. For questions regarding Sauce Labs integration, please see the Sauce Labs documentation at https://wiki.saucelabs.com/. This framework is not maintained by Sauce Labs Support.
